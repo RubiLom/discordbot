@@ -19,19 +19,55 @@ async def ping(ctx):
     await ctx.send(f'Pong🎾 {ctx.author.mention}')
 
 
+# @bot.command(pass_contex=True)
+# async def helping(ctx):
+#     if ctx.author.name == 'RubiLom':
+#         embed = nextcord.Embed(title="Команды Бота",
+#                                description="""`!kick <@Участник> <Причина(без пробелов)>` - кикнуть участника.
+# `!ban <@Участник> <Причина(без пробелов)>` - выдать бан участнику.
+# `!unban <id(Через режим разработчика)> <Причина(без пробелов)>` - снять бан с участника.
+# `!mute <@Участник> <время (в секундах)> <причина (без пробелов)>` - выдать мут участнику.
+# `!unmute <@Участик> <Причина(без пробелов)>` - снять мут с участника""", color=0x5862f5)
+#         await ctx.message.delete()
+#         await ctx.send(embed=embed)
+#     else:
+#         pass
+
+
+@bot.command(pass_contex=True)
+async def helping2(ctx):
+    if ctx.author.name == 'RubiLom':
+        embed = nextcord.Embed(title="SnOS",
+                               description='Все команды данного бота:', color=0x5862f5)
+        embed.add_field(name="Кик участник", value="`!kick <@Участник> <Причина(без пробелов)>`",
+                        inline=False)
+        embed.add_field(name="Бан участника", value="`!ban <@Участник> <Причина(без пробелов)>`",
+                        inline=False)
+        embed.add_field(name="Разбан участника", value="`!unban <id(Через режим разработчика)> <Причина(без пробелов)>`",
+                        inline=False)
+        embed.add_field(name="Мут участнику", value="`!mute <@Участник> <время (в секундах)> <причина (без пробелов)>`",
+                        inline=False)
+        embed.add_field(name="Размутить участника", value="`!unmute <@Участик> <Причина(без пробелов)>`",
+                        inline=False)
+        await ctx.message.delete()
+        await ctx.send(embed=embed)
+    else:
+        pass
+
+
 @bot.command(pass_contex=True)
 @commands.has_any_role('Разработчик', 'Администратор', 'Модератор', 'Основатель')
 async def kick(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
-        embed2 = nextcord.Embed(title=f"Кик с сервера",
-                                description=f"""Вы были кикнуты этим администратором: {ctx.author.mention}
-Причина: **{reason}**""", color=0x5862f5)
+        embed2 = nextcord.Embed(description=f"""Вы были кикнуты с сервера!
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
         await ctx.message.delete()
         await member.send(embed=embed2)
         await member.kick(reason=reason)
-        embed = nextcord.Embed(title=f"Был кикнут {member.name}",
-                               description=f"""{member.mention} был кикнут этим администратором: {ctx.author.mention}
-Причина: **{reason}**""", color=0x5862f5)
+        embed = nextcord.Embed(description=f"""Участник {member.mention} был кикнут c сервера
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
 
         await ctx.send(embed=embed)
     else:
@@ -43,15 +79,15 @@ async def kick(ctx, member: nextcord.Member, reason=None):
 @commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
 async def ban(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
-        embed2 = nextcord.Embed(title=f"Бан на сервера",
-                                description=f"""Вы были забанены этим администратором: {ctx.author.mention}
-Причина: **{reason}**""", color=0x5862f5)
+        embed2 = nextcord.Embed(description=f"""Вы были забанены на сервере!
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
         await ctx.message.delete()
         await member.send(embed=embed2)
         await member.ban(reason=reason)
-        embed = nextcord.Embed(title=f"Был забанен {member.name}",
-                               description=f"""{member.mention} был забанен этим администратором: {ctx.author.mention}
-Причина: **{reason}**""", color=0x5862f5)
+        embed = nextcord.Embed(description=f"""Участник {member.mention} был забанен
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
 
         await ctx.send(embed=embed)
 
@@ -63,11 +99,12 @@ async def ban(ctx, member: nextcord.Member, reason=None):
 
 @bot.command(pass_contex=True)
 @commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
-async def unban(ctx, id):
+async def unban(ctx, id, reason):
     user = await bot.fetch_user(id)
-    embed = nextcord.Embed(title=f"Был разбанен {user}",
-                           description=f"""{user} был разбанен этим администратором: {ctx.author.mention}""",
-                           color=0x5862f5)
+    embed = nextcord.Embed(description=f"""Участник {user} был разбанен
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
+
     try:
         await ctx.message.delete()
         await ctx.guild.unban(user)
@@ -78,20 +115,18 @@ async def unban(ctx, id):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
+@commands.has_any_role('Разработчик', 'Администратор', 'Основатель', 'Модератор')
 async def mute(ctx, member: nextcord.Member, time=None, reason=None):
     if member != ctx.author:
         time = humanfriendly.parse_timespan(time)
         await member.edit(timeout=nextcord.utils.utcnow() + datetime.timedelta(seconds=time))
         min_time = time / 60
-        embed = nextcord.Embed(title=f"Был кинут в таймаут {member.name}",
-                               description=f"""{member.mention} был кинут в таймаут этим администратором: {ctx.author.mention}
+        embed = nextcord.Embed(description=f"""Участник {member.mention} получил таймаут на **{min_time} min**
 Причина: **{reason}**
-Сроком: **{min_time} min**""", color=0x5862f5)
-        embed2 = nextcord.Embed(title=f"Таймаут на сервере",
-                                description=f"""Вы были кинуты в таймаут этим администратором: {ctx.author.mention}
+Модератор: {ctx.author.mention}""", color=0x5862f5)
+        embed2 = nextcord.Embed(description=f"""Вы получили таймаут на **{min_time} min**
 Причина: **{reason}**
-Сроком: **{min_time} min**""", color=0x5862f5)
+Модератор: {ctx.author.mention}""", color=0x5862f5)
         await ctx.message.delete()
         await member.send(embed=embed2)
         await ctx.send(embed=embed)
@@ -101,15 +136,15 @@ async def mute(ctx, member: nextcord.Member, time=None, reason=None):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
+@commands.has_any_role('Разработчик', 'Администратор', 'Основатель', "Модератор")
 async def unmute(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
-        embed = nextcord.Embed(title=f"Был снят с таймаута {member.name}",
-                               description=f"""{member.mention} был снят с таймаута этим администратором: {ctx.author.mention}
-Причина: {reason}""", color=0x5862f5)
-        embed2 = nextcord.Embed(title=f"Снят таймаут на сервере",
-                                description=f"""С вас сняли таймаут этим администратором: {ctx.author.mention}
-Причина: {reason}""", color=0x5862f5)
+        embed = nextcord.Embed(description=f"""Участник {member.mention} был снят с таймаута
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
+        embed2 = nextcord.Embed(description=f"""С вас сняли таймаут на сервере!
+Причина: **{reason}**
+Модератор: {ctx.author.mention}""", color=0x5862f5)
         await ctx.message.delete()
         await member.send(embed=embed2)
         await member.edit(timeout=None)
