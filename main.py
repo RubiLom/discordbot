@@ -3,6 +3,8 @@
 import nextcord
 import datetime
 import humanfriendly
+import config
+from nextcord import guild
 from nextcord.ext import commands
 
 settings = {
@@ -103,8 +105,8 @@ async def ban(ctx, member: nextcord.Member, reason=None):
 
 @bot.command(pass_contex=True)
 @commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
-async def unban(ctx, id, reason):
-    user = await bot.fetch_user(id)
+async def unban(ctx, id_user, reason):
+    user = await bot.fetch_user(id_user)
     embed = nextcord.Embed(description=f"""Участник {user} был разбанен
 Причина: **{reason}**
 Модератор: {ctx.author.mention}""", color=0x5862f5)
@@ -200,7 +202,7 @@ class Buttons(nextcord.ui.View):
         super().__init__(timeout=timeout)
 
     @nextcord.ui.button(label="Добавить фильм", style=nextcord.ButtonStyle.blurple)
-    async def gray_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+    async def blue_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         await interaction.response.send_modal(EmbedModal())
 
 
@@ -215,9 +217,63 @@ async def button(ctx):
         pass
 
 
+@bot.event
+async def on_raw_reaction_add(payload):
+    our_message_id = 1054104330778710046 # айди сообщения (сначала создаем его командой !react, а потом копируем его
+    # айди и вписываем сюда)
+
+    if our_message_id == payload.message_id:
+        member = payload.member  # определяем юзера
+        guild1 = member.guild  # определяем сервер
+
+        emoji = payload.emoji.name  # эмоджи при нажатии на которое выдается роль
+        if emoji == '🎁':  # само эмоджи
+            role = nextcord.utils.get(guild1.roles, name="🎁")  # определяем роль которую будем выдавать
+            await member.add_roles(role)  # выдаем рольку
+
+        elif emoji == '🎬':  # само эмоджи
+            role = nextcord.utils.get(guild1.roles, name="🎬")  # определяем роль которую будем выдавать
+            await member.add_roles(role)  # выдаем рольку
+
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    our_message_id = 1054104330778710046  # айди сообщения (сначала создаем его командой !react, а потом копируем его айди и вписываем сюда)
+
+    if our_message_id == payload.message_id:
+        guild1 = await(bot.fetch_guild(payload.guild_id))
+        emoji = payload.emoji.name  # эмоджи при нажатии на которое выдается роль
+        if emoji == '🎁':  # само эмоджи
+            role = nextcord.utils.get(guild1.roles, name="🎁")
+
+            member = await(guild1.fetch_member(payload.user_id))
+            if member is not None:
+                await member.remove_roles(role)
+            else:
+                print('not found')
+        elif emoji == '🎬':  # само эмоджи
+            role = nextcord.utils.get(guild1.roles, name="🎬")
+
+            member = await(guild1.fetch_member(payload.user_id))
+            if member is not None:
+                await member.remove_roles(role)
+            else:
+                print('not found')
+
+
+@bot.command()
+async def react(ctx):
+    channel = bot.get_channel(1037105214974591056)
+    embed = nextcord.Embed(title="Полезные роли :3", description="""Для получение нужных вам ролей:
+<@&930252257067425912> - Даст доступ в этот канал --> <#1037106184907395173>
+<@&1053654174870544394> - Даст доступ в этот канал --> <#1053990199039897630>""", color=0x5862f5)
+    mojo = await channel.send(embed=embed)
+    await mojo.add_reaction('🎁')
+    await mojo.add_reaction('🎬')
+
+
 # @bot.slash_command(name="name film", description="creat film", guild_ids=[927335861392146472])
 # async def film(interaction: nextcord.Interaction):
-#     await interaction.response.send_modal(EmbedModal())
-
+#     await interaction.response.send_modal(EmbedModal())`
 
 bot.run(settings['token'])
