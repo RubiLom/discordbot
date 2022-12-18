@@ -190,7 +190,9 @@ class EmbedModal(nextcord.ui.Modal):
         em = nextcord.Embed(title=title, description=f"{desc} | [Совместный просмотр!]({link})", color=0x5862f5)
         em.set_thumbnail(url=img)
         em.set_footer(text=f"Награда за просмотр: {award} монет!")
-        return await interaction.response.send_message(embed=em)
+        channel = bot.get_channel(1053990199039897630)
+        await channel.send('<@&1053654174870544394>')
+        await channel.send(embed=em)
 
 
 class Buttons(nextcord.ui.View):
@@ -204,11 +206,13 @@ class Buttons(nextcord.ui.View):
 
 @bot.command()
 async def button(ctx):
-    embed2 = nextcord.Embed(title="Киноафиша",
-                            description='Если вы хотите добавить фильм, то нажмите на кнопку --> "Добавить фильм"',
-                            color=0x5862f5)
-    await ctx.message.delete()
-    await ctx.send(embed=embed2, view=Buttons())
+    if ctx.author.name == 'RubiLom':
+        embed2 = nextcord.Embed(title="Киноафиша",
+                                description='Если вы хотите добавить фильм, то нажмите на кнопку --> "Добавить фильм"',
+                                color=0x5862f5)
+        await ctx.send(embed=embed2, view=Buttons())
+    else:
+        pass
 
 
 # @bot.slash_command(name="name film", description="creat film", guild_ids=[927335861392146472])
