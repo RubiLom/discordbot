@@ -1,3 +1,5 @@
+# Код написанные: RubiLom#3515
+
 import nextcord
 import datetime
 import humanfriendly
@@ -50,6 +52,7 @@ async def helping2(ctx):
                         inline=False)
         embed.add_field(name="Размутить участника", value="`!unmute <@Участик> <Причина(без пробелов)>`",
                         inline=False)
+        embed.set_footer(text=f"В случае ошибок пишите --> RubiLom#3515")
         await ctx.message.delete()
         await ctx.send(embed=embed)
     else:
@@ -158,7 +161,7 @@ async def unmute(ctx, member: nextcord.Member, reason=None):
 class EmbedModal(nextcord.ui.Modal):
     def __init__(self):
         super().__init__(
-            "КиноАфиша"
+            "Создайте свою КиноАфишу!"
         )
 
         self.emTitle = nextcord.ui.TextInput(label="Название фильма", min_length=2, max_length=50, required=True,
@@ -171,17 +174,22 @@ class EmbedModal(nextcord.ui.Modal):
         self.emImg = nextcord.ui.TextInput(label="Ссылка на фотографию", min_length=2, max_length=150, required=True,
                                            placeholder="Здесь вставьте ссылку на фотку(imgur)")
         self.add_item(self.emImg)
-        self.emUrl = nextcord.ui.TextInput(label="Ссылка на фильм", min_length=2, max_length=150, required=True,
-                                           placeholder="Здесь вставьте ссылку на фильм")
-        self.add_item(self.emUrl)
+        self.emLink = nextcord.ui.TextInput(label="Совместный просмотр", min_length=2, max_length=150, required=True,
+                                            placeholder="Вставьте ссылку на подключение к каналу!")
+        self.add_item(self.emLink)
+        self.emAward = nextcord.ui.TextInput(label="Награда", min_length=2, max_length=100, required=True,
+                                             placeholder="Введите какая будет награда за просмотр фильма/сериала")
+        self.add_item(self.emAward)
 
     async def callback(self, interaction: nextcord.Interaction) -> None:
         title = self.emTitle.value
         desc = self.emDesc.value
         img = self.emImg.value
-        url = self.emUrl.value
-        em = nextcord.Embed(title=title, description=desc, url=url, color=0x5862f5)
+        link = self.emLink.value
+        award = self.emAward.value
+        em = nextcord.Embed(title=title, description=f"{desc} | [Совместный просмотр!]({link})", color=0x5862f5)
         em.set_thumbnail(url=img)
+        em.set_footer(text=f"Награда за просмотр: {award} монет!")
         return await interaction.response.send_message(embed=em)
 
 
