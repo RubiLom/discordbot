@@ -43,7 +43,8 @@ async def helping2(ctx):
                         inline=False)
         embed.add_field(name="Бан участника", value="`!ban <@Участник> <Причина(без пробелов)>`",
                         inline=False)
-        embed.add_field(name="Разбан участника", value="`!unban <id(Через режим разработчика)> <Причина(без пробелов)>`",
+        embed.add_field(name="Разбан участника",
+                        value="`!unban <id(Через режим разработчика)> <Причина(без пробелов)>`",
                         inline=False)
         embed.add_field(name="Мут участнику", value="`!mute <@Участник> <время (в секундах)> <причина (без пробелов)>`",
                         inline=False)
@@ -152,6 +153,59 @@ async def unmute(ctx, member: nextcord.Member, reason=None):
     else:
         await ctx.send(f'Вы не можете кинуть в таймаут сами себя! {ctx.author.mention}')
         await ctx.message.delete()
+
+
+class EmbedModal(nextcord.ui.Modal):
+    def __init__(self):
+        super().__init__(
+            "КиноАфиша"
+        )
+
+        self.emTitle = nextcord.ui.TextInput(label="Название фильма", min_length=2, max_length=50, required=True,
+                                             placeholder="Здесь введите название фильма!")
+        self.add_item(self.emTitle)
+        self.emDesc = nextcord.ui.TextInput(label="Описание фильма", min_length=5, max_length=4000, required=True,
+                                            placeholder="Здесь введите описание фильма!",
+                                            style=nextcord.TextInputStyle.paragraph)
+        self.add_item(self.emDesc)
+        self.emImg = nextcord.ui.TextInput(label="Ссылка на фотографию", min_length=2, max_length=150, required=True,
+                                           placeholder="Здесь вставьте ссылку на фотку(imgur)")
+        self.add_item(self.emImg)
+        self.emUrl = nextcord.ui.TextInput(label="Ссылка на фильм", min_length=2, max_length=150, required=True,
+                                           placeholder="Здесь вставьте ссылку на фильм")
+        self.add_item(self.emUrl)
+
+    async def callback(self, interaction: nextcord.Interaction) -> None:
+        title = self.emTitle.value
+        desc = self.emDesc.value
+        img = self.emImg.value
+        url = self.emUrl.value
+        em = nextcord.Embed(title=title, description=desc, url=url, color=0x5862f5)
+        em.set_thumbnail(url=img)
+        return await interaction.response.send_message(embed=em)
+
+
+class Buttons(nextcord.ui.View):
+    def __init__(self, *, timeout=180):
+        super().__init__(timeout=timeout)
+
+    @nextcord.ui.button(label="Добавить фильм", style=nextcord.ButtonStyle.blurple)
+    async def gray_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
+        await interaction.response.send_modal(EmbedModal())
+
+
+@bot.command()
+async def button(ctx):
+    embed2 = nextcord.Embed(title="Киноафиша",
+                            description='Если вы хотите добавить фильм, то нажмите на кнопку --> "Добавить фильм"',
+                            color=0x5862f5)
+    await ctx.message.delete()
+    await ctx.send(embed=embed2, view=Buttons())
+
+
+# @bot.slash_command(name="name film", description="creat film", guild_ids=[927335861392146472])
+# async def film(interaction: nextcord.Interaction):
+#     await interaction.response.send_modal(EmbedModal())
 
 
 bot.run(settings['token'])
