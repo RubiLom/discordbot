@@ -330,14 +330,14 @@ class Buttons3(nextcord.ui.View):
     async def green_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         member = interaction.user
         channel = bot.get_channel(1055462374234132490)
+        await channel.send('''**!!!Заявка была принята!!!**
+----------------------------------------------------------''')
         embed_accept = nextcord.Embed(title='Заявка на майнкрафт сервер **SN**',
                                       description=f'''Ваша заявка была **принята**!
 Модератор: **{member.name}**
 Айпи сервера: **playsn.tk**
 Нужные моды: [SimpleVoice](https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat), [EmoteCraft FORGE](https://www.curseforge.com/minecraft/mc-mods/emotecraft-forge) / [EmoteCraft FABRIC](https://www.curseforge.com/minecraft/mc-mods/emotecraft)''', color=0x5862f5)
         await member.send(embed=embed_accept)
-        await channel.send('''**!!!Заявка была принята!!!**
-----------------------------------------------------------''')
 
 
 class Buttons4(nextcord.ui.View):
@@ -348,13 +348,13 @@ class Buttons4(nextcord.ui.View):
     async def red_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         member = interaction.user
         channel = bot.get_channel(1055462374234132490)
+        await channel.send('''**!!!Заявка была отклонена!!!**
+----------------------------------------------------------''')
         embed_declined = nextcord.Embed(title='Заявка на майнкрафт сервер **SN**',
                                       description=f'''Ваша заявка была **отклонена**!
 Модератор: {member.name}
 Так как ваша заявка была отклонена, вы можете ее переподать через неделю! (Пытаться раньше недели отправить заявку, приведет вас к муту/бану!)''', color=0x5862f5)
         await member.send(embed=embed_declined)
-        await channel.send('''**!!!Заявка была отклонена!!!**
-----------------------------------------------------------''')
 
 
 class EmbedModal2(nextcord.ui.Modal):
