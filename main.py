@@ -168,6 +168,11 @@ async def helping2(ctx):
     else:
         pass
 
+@bot.command()
+@commands.has_any_role('Основатель', 'Разработчик')
+async def dv(ctx, amount = 2):
+    await ctx.channel.purge(limit = amount + 1);
+
 
 @bot.command(pass_contex=True)
 @commands.has_any_role('Разработчик', 'Администратор', 'Модератор', 'Основатель')
@@ -337,7 +342,8 @@ class Buttons3(nextcord.ui.View):
 Модератор: **{member.name}**
 Айпи сервера: **playsn.tk**
 Нужные моды: [SimpleVoice](https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat), [EmoteCraft FORGE](https://www.curseforge.com/minecraft/mc-mods/emotecraft-forge) / [EmoteCraft FABRIC](https://www.curseforge.com/minecraft/mc-mods/emotecraft)''', color=0x5862f5)
-        await member.send(embed=embed_accept)
+        channel_for_player = bot.get_channel(1055807362725843054)
+        await channel_for_player.send(embed=embed_accept)
 
 
 class Buttons4(nextcord.ui.View):
@@ -354,7 +360,8 @@ class Buttons4(nextcord.ui.View):
                                       description=f'''Ваша заявка была **отклонена**!
 Модератор: {member.name}
 Так как ваша заявка была отклонена, вы можете ее переподать через неделю! (Пытаться раньше недели отправить заявку, приведет вас к муту/бану!)''', color=0x5862f5)
-        await member.send(embed=embed_declined)
+        channel_for_player = bot.get_channel(1055807362725843054)
+        await channel_for_player.send(embed=embed_declined)
 
 
 class EmbedModal2(nextcord.ui.Modal):
@@ -402,15 +409,17 @@ class EmbedModal2(nextcord.ui.Modal):
                                        description='Ваша заявка отправлена, ожидайте, в скором времени её проверят!',
                                        color=0x5862f5)
         channel = bot.get_channel(1055462374234132490)
-        try:
-            await member.send(embed=em_for_player)
-        except:
-            pass
-
+        channel_for_player = bot.get_channel(1055807362725843054)
+        guild2 = member.guild
+        role = nextcord.utils.get(guild2.roles, name="Ожидание")
+        await member.add_roles(role)
         await channel.send(f'<@490518336547848213> | <@530108998381207562> --> {interaction.user.mention}')
         await channel.send(embed=em)
+        await channel_for_player.send(embed=em_for_player)
+        await channel_for_player.send(f'{interaction.user.mention}')
         await channel.send(view=Buttons3())
         await channel.send(view=Buttons4())
+
 
 
 @bot.command()
