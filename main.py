@@ -1,13 +1,9 @@
 # Код написанные: RubiLom#3515
-import random
 
 import nextcord
 import datetime
 import humanfriendly
 from nextcord.ext import commands
-from tabulate import tabulate
-import json
-import sqlite3
 
 settings = {
     'token': 'MTA1MjkyNzg4NTMyMjc0Nzk3NQ.GHaxch.pPNwd2XIiEiWgQU_su4AxpbRUECVo4BsBLts-s',
@@ -19,131 +15,10 @@ settings = {
 intents = nextcord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-#Экономика
-# conn = sqlite3.connect("Discord.db") # или :memory:
-# cursor = conn.cursor()
-#
-#
-# @bot.event
-# async def on_ready():
-#     print("Bot Has been runned")#сообщение о готовности
-#     for guild in bot.guilds:#т.к. бот для одного сервера, то и цикл выводит один сервер
-#         print(guild.id)#вывод id сервера
-#         serv=guild#без понятия зачем это
-#         for member in guild.members:#цикл, обрабатывающий список участников
-#             cursor.execute(f"SELECT id FROM users where id={member.id}")#проверка, существует ли участник в БД
-#             if cursor.fetchone() is None:#Если не существует
-#                 cursor.execute(f"INSERT INTO users VALUES ({member.id}, '{member.name}', '<@{member.id}>', 50000, 'S','[]',0,0)")#вводит все данные об участнике в БД
-#             else:#если существует
-#                 pass
-#             conn.commit()#применение изменений в БД
-#
-#
-# @bot.event
-# async def on_member_join(member):
-#     cursor.execute(f"SELECT id FROM users where id={member.id}")#все также, существует ли участник в БД
-#     if cursor.fetchone() is None:#Если не существует
-#         cursor.execute(f"INSERT INTO users VALUES ({member.id}, '{member.name}', '<@{member.id}>', 50000, 'S','[]',0,0)")#вводит все данные об участнике в БД
-#     else:#Если существует
-#         pass
-#     conn.commit()#применение изменений в БД
-#
-#
-# @bot.event
-# async def on_message(message):
-#     if len(message.content) > 10:#за каждое сообщение длиной > 10 символов...
-#         for row in cursor.execute(f"SELECT xp,lvl,money FROM users where id={message.author.id}"):
-#             exp=row[0]+random.randint(5, 40)#к опыту добавляется случайное число
-#             cursor.execute(f'UPDATE users SET xp={exp} where id={message.author.id}')
-#             lvch=exp/(row[1]*1000)
-#             print(int(lvch))
-#             lv=int(lvch)
-#             if row[1] < lv:#если текущий уровень меньше уровня, который был рассчитан формулой выше,...
-#                 await message.channel.send(f'Новый уровень!')#то появляется уведомление...
-#                 bal=1000*lv
-#                 cursor.execute(f'UPDATE users SET lvl={lv},money={bal} where id={message.author.id}')#и участник получает деньги
-#     await bot.process_commands(message)#Далее это будет необходимо для ctx команд
-#     conn.commit()#применение изменений в БД
-#
-#
-# @bot.command()
-# async def account(ctx):  # команда _account (где "_", ваш префикс указаный в начале)
-#     table = [["nickname", "money", "lvl", "xp"]]
-#     for row in cursor.execute(f"SELECT nickname,money,lvl,xp FROM users where id={ctx.author.id}"):
-#         table.append([row[0], row[1], row[2], row[3]])
-#         await ctx.send(f">\n{tabulate(table)}")
-#
-#
-# @bot.command()
-# async def inventory(ctx):  # команда _inventory (где "_", ваш префикс указаный в начале)
-#
-#     counter = 0
-#     for row in cursor.execute(f"SELECT inventory FROM users where id={ctx.author.id}"):
-#         data = json.loads(row[0])
-#         table = [["id", "type", "name"]]
-#         for row in data:
-#             prt = row
-#             for row in cursor.execute(f"SELECT id,type,name FROM shop where id={prt}"):
-#                 counter += 1
-#                 table.append([row[0], row[1], row[2]])
-#
-#                 if counter == len(data):
-#                     await ctx.send(f'>\n{tabulate(table)}')
-#
-#
-# @bot.command()
-# async def shop(ctx):  # команда _shop (где "_", ваш префикс указаный в начале)
-#     counter = 0
-#     table = [["id", "type", "name", "cost"]]
-#     for row in cursor.execute(f"SELECT id,type,name,cost FROM shop"):
-#         counter += 1
-#         table.append([row[0], row[1], row[2], row[3]])
-#         if counter == 4:
-#             await ctx.send(f'>\n{tabulate(table)}')
-#
-#
-# async def buy(ctx, a: int):
-#     uid = ctx.author.id
-#     await ctx.send('Обработка... Если ответа не последует, указан неверный id предмета [buy {id}]')
-#     for row in cursor.execute(f"SELECT money FROM users where id={uid}"):
-#         money = row[0]
-#         for row in cursor.execute(f"SELECT id,name,cost FROM shop where id={a}"):
-#             cost = row[2]
-#             if money >= cost:  # если у вас достаточно денег,то...
-#                 money -= cost
-#                 await ctx.send(f'Вы приобрели "{row[1]}" за {row[2]}')
-#
-#                 for row in cursor.execute(f"SELECT inventory FROM users where id={uid}"):
-#                     data = json.loads(row[0])
-#                     data.append(a)
-#                     deed = json.dumps(data)
-#                     cursor.execute('UPDATE users SET money=?,inventory = ? where id=?',
-#                                    (money, deed, uid))  # добавляет предмет вам в инвентарь
-#                     pass
-#             if money < cost:  # иначе сообщает о недостатке
-#                 await ctx.send(f'Недостаточно средств')
-#                 pass
-#     conn.commit()  # применение изменений в БД
-
 
 @bot.command(pass_contex=True)
 async def ping(ctx):
     await ctx.send(f'Pong🎾 {ctx.author.mention}')
-
-
-# @bot.command(pass_contex=True)
-# async def helping(ctx):
-#     if ctx.author.name == 'RubiLom':
-#         embed = nextcord.Embed(title="Команды Бота",
-#                                description="""`!kick <@Участник> <Причина(без пробелов)>` - кикнуть участника.
-# `!ban <@Участник> <Причина(без пробелов)>` - выдать бан участнику.
-# `!unban <id(Через режим разработчика)> <Причина(без пробелов)>` - снять бан с участника.
-# `!mute <@Участник> <время (в секундах)> <причина (без пробелов)>` - выдать мут участнику.
-# `!unmute <@Участик> <Причина(без пробелов)>` - снять мут с участника""", color=0x5862f5)
-#         await ctx.message.delete()
-#         await ctx.send(embed=embed)
-#     else:
-#         pass
 
 
 @bot.command(pass_contex=True)
@@ -167,6 +42,7 @@ async def helping2(ctx):
         await ctx.send(embed=embed)
     else:
         pass
+
 
 @bot.command()
 @commands.has_any_role('Основатель', 'Разработчик')
@@ -340,8 +216,7 @@ class Buttons3(nextcord.ui.View):
         embed_accept = nextcord.Embed(title='Заявка на майнкрафт сервер **SN**',
                                       description=f'''Ваша заявка была **принята**!
 Модератор: **{member.name}**
-Айпи сервера: **playsn.tk**
-Нужные моды: [SimpleVoice](https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat), [EmoteCraft FORGE](https://www.curseforge.com/minecraft/mc-mods/emotecraft-forge) / [EmoteCraft FABRIC](https://www.curseforge.com/minecraft/mc-mods/emotecraft)''', color=0x5862f5)
+Теперь вам доступен этот канал <#1057601206840721458> со всей вам нужной информацией для захода на сервер!''', color=0x5862f5)
         channel_for_player = bot.get_channel(1055807362725843054)
         await channel_for_player.send(embed=embed_accept)
 
