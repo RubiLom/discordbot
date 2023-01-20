@@ -45,13 +45,13 @@ async def helping2(ctx):
 
 
 @bot.command()
-@commands.has_any_role('Основатель', 'Разработчик')
-async def dv(ctx, amount = 2):
-    await ctx.channel.purge(limit = amount + 1);
+@commands.has_any_role('Владелец', 'Разработчик')
+async def dv(ctx, amount=2):
+    await ctx.channel.purge(limit=amount + 1)
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Модератор', 'Основатель')
+@commands.has_any_role('Разработчик', 'Модератор', 'Владелец')
 async def kick(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
         embed2 = nextcord.Embed(description=f"""Вы были кикнуты с сервера!
@@ -71,7 +71,7 @@ async def kick(ctx, member: nextcord.Member, reason=None):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
+@commands.has_any_role('Разработчик', 'Владелец')
 async def ban(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
         embed2 = nextcord.Embed(description=f"""Вы были забанены на сервере!
@@ -93,7 +93,7 @@ async def ban(ctx, member: nextcord.Member, reason=None):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель')
+@commands.has_any_role('Разработчик', 'Владелец')
 async def unban(ctx, id_user, reason):
     user = await bot.fetch_user(id_user)
     embed = nextcord.Embed(description=f"""Участник {user} был разбанен
@@ -110,7 +110,7 @@ async def unban(ctx, id_user, reason):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель', 'Модератор')
+@commands.has_any_role('Разработчик', 'Владелец', 'Модератор')
 async def mute(ctx, member: nextcord.Member, time=None, reason=None):
     if member != ctx.author:
         time = humanfriendly.parse_timespan(time)
@@ -131,7 +131,7 @@ async def mute(ctx, member: nextcord.Member, time=None, reason=None):
 
 
 @bot.command(pass_contex=True)
-@commands.has_any_role('Разработчик', 'Администратор', 'Основатель', "Модератор")
+@commands.has_any_role('Разработчик', 'Владелец', "Модератор")
 async def unmute(ctx, member: nextcord.Member, reason=None):
     if member != ctx.author:
         embed = nextcord.Embed(description=f"""Участник {member.mention} был снят с таймаута
@@ -147,6 +147,41 @@ async def unmute(ctx, member: nextcord.Member, reason=None):
     else:
         await ctx.send(f'Вы не можете кинуть в таймаут сами себя! {ctx.author.mention}')
         await ctx.message.delete()
+
+
+@bot.command(pass_contex=True)
+@commands.cooldown(1, 3600, commands.BucketType.user)
+async def reqmeme(ctx, url):
+    embed = nextcord.Embed(color=0x5862f5)
+    embed.set_image(url=f"{url}")
+    channel = bot.get_channel(1065295974911709234)
+    await channel.send(f'{ctx.author.mention}')
+    mojo = await channel.send(embed=embed)
+    await mojo.add_reaction('👍🏻')
+    await mojo.add_reaction('👎🏻')
+    await ctx.message.delete()
+
+
+@bot.command(pass_context=True)
+async def gr(ctx, member: nextcord.Member):
+    if ctx.author.name == 'Котик':
+        guild_role = member.guild
+        role = nextcord.utils.find(lambda r: r.name == 'Котик', guild_role.roles)
+        if member.name == 'RubiLom':
+            ctx.send('Вы не можете выдать данному игроку роль (Котик)')
+        else:
+            if role in member.roles:
+                embed = nextcord.Embed(title='Убрана кастомная роль',
+                                       description=f'Успешно убрана роль <@&1066014838867894354> участнику {member.mention}',
+                                       color=0x5862f5)
+                await member.remove_roles(role)
+                await ctx.send(embed=embed)
+            else:
+                await member.add_roles(role)
+                embed = nextcord.Embed(title='Выдана кастомная роль',
+                                       description=f'Успешно выдана роль <@&1066014838867894354> участнику {member.mention}',
+                                       color=0x5862f5)
+                await ctx.send(embed=embed)
 
 
 class EmbedModal(nextcord.ui.Modal):
@@ -194,6 +229,7 @@ class Buttons(nextcord.ui.View):
     async def blue_button(self, button: nextcord.ui.Button, interaction: nextcord.Interaction):
         await interaction.response.send_modal(EmbedModal())
 
+
 class Buttons2(nextcord.ui.View):
     def __init__(self, *, timeout=None):
         super().__init__(timeout=timeout)
@@ -216,7 +252,8 @@ class Buttons3(nextcord.ui.View):
         embed_accept = nextcord.Embed(title='Заявка на майнкрафт сервер **SN**',
                                       description=f'''Ваша заявка была **принята**!
 Модератор: **{member.name}**
-Теперь вам доступен этот канал <#1057601206840721458> со всей вам нужной информацией для захода на сервер!''', color=0x5862f5)
+Теперь вам доступен этот канал <#1057601206840721458> со всей вам нужной информацией для захода на сервер!''',
+                                      color=0x5862f5)
         channel_for_player = bot.get_channel(1055807362725843054)
         await channel_for_player.send(embed=embed_accept)
 
@@ -232,9 +269,10 @@ class Buttons4(nextcord.ui.View):
         await channel.send('''**!!!Заявка была отклонена!!!**
 ----------------------------------------------------------''')
         embed_declined = nextcord.Embed(title='Заявка на майнкрафт сервер **SN**',
-                                      description=f'''Ваша заявка была **отклонена**!
+                                        description=f'''Ваша заявка была **отклонена**!
 Модератор: {member.name}
-Так как ваша заявка была отклонена, вы можете ее переподать через неделю! (Пытаться раньше недели отправить заявку, приведет вас к муту/бану!)''', color=0x5862f5)
+Так как ваша заявка была отклонена, вы можете ее переподать через неделю! (Пытаться раньше недели отправить заявку, приведет вас к муту/бану!)''',
+                                        color=0x5862f5)
         channel_for_player = bot.get_channel(1055807362725843054)
         await channel_for_player.send(embed=embed_declined)
 
@@ -246,26 +284,29 @@ class EmbedModal2(nextcord.ui.Modal):
         )
 
         self.emNick = nextcord.ui.TextInput(label="Игровой никнейм", min_length=2, max_length=50, required=True,
-                                             placeholder="Введите ваш игровой никнейм!")
+                                            placeholder="Введите ваш игровой никнейм!")
         self.add_item(self.emNick)
         self.emOld = nextcord.ui.TextInput(label="Сколько вам лет?", min_length=1, max_length=10, required=True,
-                                             placeholder="Напишите сколько вам лет? (Пример: 16)")
+                                           placeholder="Напишите сколько вам лет? (Пример: 16)")
         self.add_item(self.emOld)
         # self.emHobby = nextcord.ui.TextInput(label="Хобби", min_length=1, max_length=1000, required=True,
         #                                      placeholder="Напишите какие ваши любимые хобби!",
         #                                      style=nextcord.TextInputStyle.paragraph)
         # self.add_item(self.emHobby)
-        self.emAd = nextcord.ui.TextInput(label="От куда вы узнали про нас?", min_length=1, max_length=1000, required=True,
-                                             placeholder="Напишите от куда вы знаете нас!",
-                                             style=nextcord.TextInputStyle.paragraph)
+        self.emAd = nextcord.ui.TextInput(label="От куда вы узнали про нас?", min_length=1, max_length=1000,
+                                          required=True,
+                                          placeholder="Напишите от куда вы знаете нас!",
+                                          style=nextcord.TextInputStyle.paragraph)
         self.add_item(self.emAd)
-        self.emStudy = nextcord.ui.TextInput(label="Чем планируете заниматься?", min_length=1, max_length=1000, required=True,
+        self.emStudy = nextcord.ui.TextInput(label="Чем планируете заниматься?", min_length=1, max_length=1000,
+                                             required=True,
                                              placeholder="Напишите чем планируете заниматься на сервере!",
                                              style=nextcord.TextInputStyle.paragraph)
         self.add_item(self.emStudy)
-        self.emMod = nextcord.ui.TextInput(label="Какие моды/текстурпаки используете?", min_length=1, max_length=1000, required=True,
-                                             placeholder="Напишите какие моды/текстурпаки используете!",
-                                             style=nextcord.TextInputStyle.paragraph)
+        self.emMod = nextcord.ui.TextInput(label="Какие моды/текстурпаки используете?", min_length=1, max_length=1000,
+                                           required=True,
+                                           placeholder="Напишите какие моды/текстурпаки используете!",
+                                           style=nextcord.TextInputStyle.paragraph)
         self.add_item(self.emMod)
 
     async def callback(self, interaction: nextcord.Interaction) -> None:
@@ -296,7 +337,6 @@ class EmbedModal2(nextcord.ui.Modal):
         await channel.send(view=Buttons4())
 
 
-
 @bot.command()
 async def button(ctx):
     if ctx.author.name == 'RubiLom':
@@ -317,6 +357,25 @@ async def button2(ctx):
                                 color=0x5862f5)
         await ctx.message.delete()
         await ctx.send(embed=embed2, view=Buttons2())
+    else:
+        pass
+
+
+@bot.command()
+async def button3(ctx):
+    if ctx.author.name == 'RubiLom':
+        embed3 = nextcord.Embed(title="Информация для новоприбывших игроков!",
+                                description='''
+ip: **playsn.tk**
+Версия: **1.19.2**
+Требуемые моды:
+[SimpleVoice FORGE](https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat/download/4271664) / [SimpleVoice FABRIC](https://www.curseforge.com/minecraft/mc-mods/simple-voice-chat/download/4271665)
+[EmoteCraft FORGE](https://www.curseforge.com/minecraft/mc-mods/emotecraft-forge/download/4173796) / [EmoteCraft FABRIC](https://www.curseforge.com/minecraft/mc-mods/emotecraft/download/4173795)
+[PlayerAnimator FORGE](https://www.curseforge.com/minecraft/mc-mods/playeranimator/download/4111521) / [PlayerAnimator FABRIC](https://www.curseforge.com/minecraft/mc-mods/playeranimator/download/4111522)
+''',
+                                color=0x5862f5)
+        await ctx.message.delete()
+        await ctx.send(embed=embed3)
     else:
         pass
 
@@ -346,7 +405,8 @@ async def on_raw_reaction_add(payload):
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-    our_message_id = 1055554624964284516  # айди сообщения (сначала создаем его командой !react, а потом копируем его айди и вписываем сюда)
+    our_message_id = 1055554624964284516  # айди сообщения (сначала создаем его командой !react, а потом копируем его
+    # айди и вписываем сюда)
 
     if our_message_id == payload.message_id:
         guild1 = await(bot.fetch_guild(payload.guild_id))
@@ -386,13 +446,12 @@ async def react(ctx):
 > <@&1055549927838720011> — <#1055550642665553971>
 > <@&1053654174870544394> — <#1053990199039897630>
 > <@&930252257067425912> — <#1037106184907395173>
-```Также вы можете подписать каналы к вашему серверу зайдя на них и нажав на кнопку "Подписаться".```""", color=0x5862f5)
+```Также вы можете подписать каналы к вашему серверу зайдя на них и нажав на кнопку "Подписаться".```""",
+                           color=0x5862f5)
     mojo = await channel.send(embed=embed)
     await mojo.add_reaction('🎁')
     await mojo.add_reaction('🎬')
     await mojo.add_reaction('📺')
-
-
 
 
 # @bot.slash_command(name="name film", description="creat film", guild_ids=[927335861392146472])
